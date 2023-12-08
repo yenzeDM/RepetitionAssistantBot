@@ -17,7 +17,7 @@ async def delete_text(message: types.Message, state: FSMContext):
     await update_last_activity(message)
     if await show_list_of_phrases(message):
         await state.set_state(DeleteText.delete_en_phrase)
-        await message.answer('To cancel command, you should enter⚠️ /cancel\n\n🖌Enter the text that you want to delete _(Enter the text that you added in the first step of the "Add text" command.)_:', parse_mode='Markdown')
+        await message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️Enter the text that you want to delete _(Enter the text that you added in the first step of the "Add text" command.)_:', parse_mode='Markdown')
     else:
         await message.answer('Your dictionary is empty 🗑')
 

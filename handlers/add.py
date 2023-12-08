@@ -26,7 +26,7 @@ async def start_to_add(message: types.Message, state: FSMContext):
 
 To cancel command, you should enter⚠️ /cancel
 
-🖌 Enter anything you want to practice. It can be either a word in the language you want to practice or an answer to a rule or task:''')
+✍️ Enter anything you want to practice. It can be either a word in the language you want to practice or an answer to a rule or task:''')
 
 
 @router.message(AddText.phrase)
@@ -36,7 +36,7 @@ async def add_en_phrase(message: types.Message, state: FSMContext):
     await state.set_state(AddText.translation)
     await message.answer('''2️⃣
 
-🖌 Enter the translation of the word if you have added a word, or write a question about the rule or task if you have added an answer to them in the previous step:''')
+✍️ Enter the translation of the word if you have added a word, or write a question about the rule or task if you have added an answer to them in the previous step:''')
 
 
 @router.message(AddText.translation)
@@ -46,7 +46,7 @@ async def add_translation(message: types.Message, state: FSMContext):
     await state.set_state(AddText.days_before_repetition)
     await message.answer('''3️⃣
 
-🖌 Enter days before repetition from 1️⃣ to 3️⃣0️⃣:''')
+✍️ Enter days before repetition from 1️⃣ to 3️⃣0️⃣:''')
 
 
 @router.message(AddText.days_before_repetition, F.text.in_(available_number_for_repetition))

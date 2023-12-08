@@ -2,7 +2,6 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram import types
 from db.func_for_db import add_user_id_in_db, update_last_activity, show_list_of_phrases, delete_all_data_from_phrases
-from bot import bot
 from keyboards.client_keyboards import kb_for_command_menu
 from additional_func import handler_for_show_list
 from asyncio import sleep
@@ -43,9 +42,11 @@ async def command_help(message: types.Message):
 
 🧾 <b>List of phrases</b> - shows everything you have added. You can also use this command by typing <b>"List"</b> in the chat with the bot.
 
+🎲 <b>Change days before repetition</b> - changes the days for a specific text you have added. You can also use this command by typing <b>"Change"</b> in the chat with the bot.
+
 📨 <b>Add phrase</b> - adding text to your dictionary with the indication of how many days should pass before repetition. You can also use this command by typing <b>"Add"</b> in the chat with the bot.
 
-✂️ <b>Delete phrase</b> - Delete a specific phrase or word from your dictionary. You can also use this command by typing <b>"Delete"</b> in the chat with the bot.''', parse_mode='HTML')
+✂️ <b>Delete phrase</b> - delete a specific phrase or word from your dictionary. You can also use this command by typing <b>"Delete"</b> in the chat with the bot.''', parse_mode='HTML')
 
 
 @router.message(Command("menu"))
