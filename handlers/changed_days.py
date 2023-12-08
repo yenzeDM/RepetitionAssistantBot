@@ -27,11 +27,11 @@ async def command_changed(message: types.Message, state: FSMContext):
                 await message.answer(await handler_for_show_list(all_phrases[0:99], translation=True, days=True))
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
-            await message.answer('✍️ Copy and enter your phrase above without the days only the text where you want to change days before repetition:')
+            await message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️ Copy and enter your phrase above without the days only the text where you want to change days before repetition:')
         else:
             await message.answer(await handler_for_show_list(all_phrases, translation=True, days=True))
             await sleep(0.5)
-            await message.answer('✍️ Copy and enter your phrase above without the days only the text where you want to change days before repetition:')
+            await message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️ Copy and enter your phrase above without the days only the text where you want to change days before repetition:')
     else:
         await message.answer('You have nothing in your dictionary 🗑')
         await state.clear()
