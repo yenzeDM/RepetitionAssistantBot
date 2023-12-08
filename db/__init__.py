@@ -1,0 +1,1 @@
+from db import func_for_db

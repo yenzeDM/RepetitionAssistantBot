@@ -1,0 +1,6 @@
+__pycache__/
+test*
+venv/
+bot.db
+data.py
+.env
