@@ -1,5 +1,4 @@
 from aiogram import Bot, Dispatcher
-from data import Token
 from dotenv import load_dotenv
 import os
 
