@@ -62,11 +62,11 @@ async def command_show(message: types.Message):
         all_phrases = await show_list_of_phrases(message)
         if len(all_phrases) > 100:
             while all_phrases:
-                await message.answer(await handler_for_show_list(all_phrases[0:99], phrase=True, translation=True, date=True, days=True))
+                await message.answer(await handler_for_show_list(all_phrases[0:99], phrase=True, translation=True, days=True))
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
         else:
-            await message.answer(await handler_for_show_list(all_phrases, phrase=True, translation=True, date=True, days=True))
+            await message.answer(await handler_for_show_list(all_phrases, phrase=True, translation=True, days=True))
     except:
         await message.answer('You have nothing in your dictionary 🗑')
 
