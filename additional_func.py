@@ -35,8 +35,6 @@ async def phrases_to_repeat(all_user_phrases):
     # сортирует по дням до повторения все слова юзера
     for i, j, date, days_before_repetition in sorted(all_user_phrases, key=lambda list: list[3]):
         date_of_addition = datetime.datetime.strptime(date, '%Y-%m-%d')
-        # days_gone_by = date_of_addition - todays_date
-        # if abs(days_gone_by.days) < i[3]: если не будет работать удалить что внизу и оставить это
         days_gone_by = todays_date - date_of_addition
         if days_gone_by.days < days_before_repetition:
             continue
