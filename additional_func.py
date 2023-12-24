@@ -41,3 +41,19 @@ async def phrases_to_repeat(all_user_phrases):
         else:
             result.append((i, j, date, days_before_repetition))
     return result
+
+
+async def divide(str, delimiter):
+    result = []
+    tmp = ''
+    for i in str:
+        if i == delimiter:
+            delimiter_index = str.index(delimiter)
+            tmp = str[0:delimiter_index]
+            str = str[delimiter_index + 1::]
+            result.append(tmp.strip())
+            tmp = ''
+        else:
+            tmp += i
+    result.append(tmp.strip())
+    return result
