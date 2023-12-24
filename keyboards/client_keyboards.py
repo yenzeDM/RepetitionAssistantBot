@@ -1,22 +1,36 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButton, InlineKeyboardMarkup
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 
 
 async def kb_for_command_menu():
-    kb = [
+    buttons = [
         [
             KeyboardButton(text='📓 Learning'),
-            KeyboardButton(text='📨 Add text'),
+            KeyboardButton(text='📨 Addition'),
         ],
         [
-            KeyboardButton(text='🎲 Change days before repetition')
+            KeyboardButton(text='🎲 Change days before repetition'),
         ],
         [
             KeyboardButton(text='🧾 List of phrases'),
-            KeyboardButton(text='✂️ Delete phrase'),
+            KeyboardButton(text='✂️ Deletion'),
         ],
     ]
 
-    client_buttons = ReplyKeyboardMarkup(
-        keyboard=kb, resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=buttons, one_time_keyboard=True, resize_keyboard=True)
 
-    return client_buttons
+    return keyboard
+
+
+async def kb_for_delete():
+    buttons = [
+        [
+            InlineKeyboardButton(
+                text='Delete all', callback_data='delete_all'),
+            InlineKeyboardButton(text='Delete several',
+                                 callback_data='delete_several'),
+            InlineKeyboardButton(text='Delete one', callback_data='delete_one')
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
