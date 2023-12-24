@@ -62,20 +62,13 @@ async def command_show(message: types.Message):
         all_phrases = await show_list_of_phrases(message)
         if len(all_phrases) > 100:
             while all_phrases:
-                await message.answer(await handler_for_show_list(all_phrases[0:99], phrase=True, translation=True, days=True))
+                await message.answer(await handler_for_show_list(all_phrases[0:99], phrase=True, translation=True, days=True), parse_mode='Markdown')
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
         else:
-            await message.answer(await handler_for_show_list(all_phrases, phrase=True, translation=True, days=True))
+            await message.answer(await handler_for_show_list(all_phrases, phrase=True, translation=True, days=True), parse_mode='Markdown')
     except:
         await message.answer('You have nothing in your dictionary 🗑')
-
-
-@router.message(Command("delete_all"))
-async def command_delete_all_phrases(message: types.Message):
-    await update_last_activity(message)
-    await delete_all_data_from_phrases(message.from_user.id)
-    await message.answer('✅ You deleted all phrases successful')
 
 
 @router.message(F.text)

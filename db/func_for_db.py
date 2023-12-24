@@ -34,7 +34,16 @@ async def delete_specific_phrase(message):
     base.commit()
 
 
-# other.py
+# delete.py
+async def delete_several_phrases(list, message):
+    while list:
+        cur.execute('DELETE FROM phrases WHERE phrase == ? and user_tg_id == ?',
+                    (list[0], message.from_user.id,))
+        list = list[1::]
+    base.commit()
+
+
+# delete.py
 async def delete_all_data_from_phrases(id):
     cur.execute('DELETE FROM phrases WHERE user_tg_id == ?', (id,))
     base.commit()
