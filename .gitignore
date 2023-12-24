@@ -4,3 +4,4 @@ venv/
 bot.db
 data.py
 .env
+.vscode/
