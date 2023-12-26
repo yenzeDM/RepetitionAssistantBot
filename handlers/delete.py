@@ -12,7 +12,7 @@ router = Router()
 
 
 class DeleteText(StatesGroup):
-    choose_type_of_deletion = State()
+    choose_deletion_type = State()
     finish_delete_several = State()
 
 
@@ -20,7 +20,7 @@ class DeleteText(StatesGroup):
 async def delete_text(message: types.Message, state: FSMContext):
     await update_last_activity(message)
     if await show_list_of_phrases(message):
-        await state.set_state(DeleteText.choose_type_of_deletion)
+        await state.set_state(DeleteText.choose_deletion_type)
         await message.answer('Choose type of deletion', reply_markup=await kb_for_delete())
     else:
         await message.answer('Your dictionary is empty 🗑')
@@ -39,7 +39,7 @@ async def delete_all(callback: types.CallbackQuery, state: FSMContext):
 async def delete_several(callback: types.CallbackQuery, state: FSMContext):
     await bot.send_message(callback.from_user.id, 'To cancel command, you should enter⚠️ /cancel\n\n✍Enter several phrases to delete separated by commas _(Enter the text that you added in the first step of the "Add text" command.)_:', parse_mode='Markdown')
     await callback.message.delete()
-    await state.update_data(type_of_deletion=callback.data)
+    await state.update_data(deletion_type=callback.data)
     await callback.answer()
 
 
@@ -47,14 +47,14 @@ async def delete_several(callback: types.CallbackQuery, state: FSMContext):
 async def delete_one(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await callback.message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️Enter the text that you want to delete _(Enter the text that you added in the first step of the "Add text" command.)_:', parse_mode='Markdown')
-    await state.update_data(type_of_deletion=callback.data)
+    await state.update_data(deletion_type=callback.data)
     await callback.answer()
 
 
-@router.message(DeleteText.choose_type_of_deletion)
+@router.message(DeleteText.choose_deletion_type)
 async def delete_text(message: types.Message, state: FSMContext):
-    type_of_deletion = await state.get_data()
-    if type_of_deletion['type_of_deletion'] == 'delete_several':
+    deletion_type = await state.get_data()
+    if deletion_type['deletion_type'] == 'delete_several':
         try:
             phrases_for_deletion = await divide(message.text, ',')
             await delete_several_phrases(phrases_for_deletion, message)
@@ -64,7 +64,7 @@ async def delete_text(message: types.Message, state: FSMContext):
             await message.answer(
                 '❌ An error occurred, please check if all the phrases are separated by commas and if they are in your dictionary.')
             await state.clear()
-    elif type_of_deletion['type_of_deletion'] == 'delete_one':
+    elif deletion_type['deletion_type'] == 'delete_one':
         try:
             await delete_specific_phrase(message)
             await message.answer('✅ Deletion successful')

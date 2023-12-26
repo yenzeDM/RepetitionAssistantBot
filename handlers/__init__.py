@@ -1,1 +1,1 @@
-from handlers import add, cancel, changed_days, delete, learn, other
+from handlers import add, cancel, change_days, delete, learn, other

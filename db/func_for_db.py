@@ -1,6 +1,6 @@
 import sqlite3 as sq
 import datetime
-from additional_func import phrases_to_repeat
+from additional_func import check_text_to_repeat
 from datetime import date
 
 
@@ -60,7 +60,7 @@ async def show_list_of_phrases(message):
 async def show_phrase_for_learn(id):
     list = cur.execute('SELECT phrase, translation, date_of_addition, days_before_repetition FROM phrases WHERE user_tg_id == ?',
                        (id,)).fetchall()
-    result = await phrases_to_repeat(list)
+    result = await check_text_to_repeat(list)
     return result
 
 

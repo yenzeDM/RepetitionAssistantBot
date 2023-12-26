@@ -1,6 +1,7 @@
 import datetime
 
 
+# other.py, learn.py, change_days.py
 async def handler_for_show_list(list, phrase=None, translation=None, date=None, days=None):
     result = []
     output_values = {
@@ -28,7 +29,8 @@ async def handler_for_show_list(list, phrase=None, translation=None, date=None, 
     return '\n\n'.join(result)
 
 
-async def phrases_to_repeat(all_user_phrases):
+# func_for_db.py
+async def check_text_to_repeat(all_user_phrases):
     result = []
     todays_date = datetime.datetime.strptime(
         str(datetime.date.today()), '%Y-%m-%d')

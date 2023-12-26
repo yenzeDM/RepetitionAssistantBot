@@ -3,6 +3,7 @@ from aiogram.filters import Command
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from db.func_for_db import update_last_activity
+from language.russian import Russian
 
 
 router = Router()
@@ -12,4 +13,4 @@ router = Router()
 async def cancel_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
     await state.clear()
-    await message.answer('✅ Cancellation successful')
+    await message.answer(Russian.CANCEL)

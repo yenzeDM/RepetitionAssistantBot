@@ -34,3 +34,13 @@ async def kb_for_delete():
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
+
+
+async def kb_for_add():
+    buttons = [
+        [
+            InlineKeyboardButton(text='Menu', callback_data='menu'),
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard

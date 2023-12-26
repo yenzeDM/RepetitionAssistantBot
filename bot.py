@@ -1,5 +1,5 @@
 import asyncio
-from handlers import other, add, delete, learn, cancel, changed_days
+from handlers import change_days, other, add, delete, learn, cancel
 from db.func_for_db import db_start, db_finish
 import logging
 from create_bot import dp, bot
@@ -35,7 +35,7 @@ async def main():
         add.router,
         delete.router,
         learn.router,
-        changed_days.router,
+        change_days.router,
         other.router,
     )
 

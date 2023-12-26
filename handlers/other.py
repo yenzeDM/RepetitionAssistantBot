@@ -5,6 +5,7 @@ from db.func_for_db import add_user_id_in_db, update_last_activity, show_list_of
 from keyboards.client_keyboards import kb_for_command_menu
 from additional_func import handler_for_show_list
 from asyncio import sleep
+from language.russian import Russian
 
 
 router = Router()
@@ -52,7 +53,7 @@ async def command_help(message: types.Message):
 @router.message(Command("menu"))
 async def command_menu(message: types.Message):
     await update_last_activity(message)
-    await message.answer('Choose any command', reply_markup=await kb_for_command_menu())
+    await message.answer(Russian.MENU, reply_markup=await kb_for_command_menu())
 
 
 @router.message(F.text.contains("List"))

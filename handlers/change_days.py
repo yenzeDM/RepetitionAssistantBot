@@ -5,6 +5,7 @@ from db.func_for_db import update_last_activity, show_list_of_phrases, change_da
 from aiogram import Router, F
 from asyncio import sleep
 from additional_func import handler_for_show_list
+from language.russian import Russian
 
 
 available_number_for_repetition = [str(i) for i in range(1, 31)]
@@ -17,7 +18,7 @@ class ChangedDaysBeforeRepetition(StatesGroup):
 
 
 @router.message(F.text.contains('Change'))
-async def command_changed(message: types.Message, state: FSMContext):
+async def change_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
     await state.set_state(ChangedDaysBeforeRepetition.phrase)
     all_phrases = await show_list_of_phrases(message)
@@ -27,25 +28,25 @@ async def command_changed(message: types.Message, state: FSMContext):
                 await message.answer(await handler_for_show_list(all_phrases[0:99], translation=True, days=True))
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
-            await message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️ Copy and enter your phrase above without the days only the text where you want to change days before repetition:')
+            await message.answer(Russian.HELP_TEXT_FOR_CHANGE, parse_mode='Markdown')
         else:
             await message.answer(await handler_for_show_list(all_phrases, translation=True, days=True))
             await sleep(0.5)
-            await message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️ Copy and enter your phrase above without the days only the text where you want to change days before repetition:')
+            await message.answer(Russian.HELP_TEXT_FOR_CHANGE, parse_mode='Markdown')
     else:
-        await message.answer('You have nothing in your dictionary 🗑')
+        await message.answer(Russian.EMPTY)
         await state.clear()
 
 
 @router.message(ChangedDaysBeforeRepetition.phrase)
-async def command_phrase(message: types.Message, state: FSMContext):
+async def help_text_handler(message: types.Message, state: FSMContext):
     await state.update_data(translation=message.text.lower())
     await state.set_state(ChangedDaysBeforeRepetition.change)
-    await message.answer('✍️ Enter days before repetition from 1️⃣ to 3️⃣0️⃣:')
+    await message.answer(Russian.DAYS_BEFORE_REPETITION_FOR_CHANGE)
 
 
 @router.message(ChangedDaysBeforeRepetition.change, F.text.in_(available_number_for_repetition))
-async def add_day_before_repetition(message: types.Message, state: FSMContext):
+async def day_before_repetition_handler(message: types.Message, state: FSMContext):
     await state.update_data(days_before_repetition=int(message.text.strip()))
     data = await state.get_data()
     try:
@@ -58,5 +59,5 @@ async def add_day_before_repetition(message: types.Message, state: FSMContext):
 
 
 @router.message(ChangedDaysBeforeRepetition.change)
-async def add_day_before_repetition_incorrectly(message: types.Message):
+async def day_before_repetition_incorrectly_handler(message: types.Message):
     await message.answer('❌ You have specified an incorrect number, please choose a number from 1️⃣ to 3️⃣0️⃣:')
