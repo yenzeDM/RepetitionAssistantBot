@@ -28,11 +28,11 @@ async def change_handler(message: types.Message, state: FSMContext):
                 await message.answer(await handler_for_show_list(all_phrases[0:99], translation=True, days=True))
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
-            await message.answer(Russian.CHANGE_HELP_TEXT_ENTER, parse_mode='Markdown')
+            await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
         else:
             await message.answer(await handler_for_show_list(all_phrases, translation=True, days=True))
             await sleep(0.5)
-            await message.answer(Russian.CHANGE_HELP_TEXT_ENTER, parse_mode='Markdown')
+            await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
     else:
         await message.answer(Russian.CHANGE_EMPTY)
         await state.clear()
@@ -42,7 +42,7 @@ async def change_handler(message: types.Message, state: FSMContext):
 async def help_text_handler(message: types.Message, state: FSMContext):
     await state.update_data(translation=message.text.lower())
     await state.set_state(ChangedDaysBeforeRepetition.change)
-    await message.answer(Russian.CHANGE_HELP_TEXT_DAYS_BEFORE_REPETITION)
+    await message.answer(Russian.CHANGE_DAYS_BEFORE_REPETITION)
 
 
 @router.message(ChangedDaysBeforeRepetition.change, F.text.in_(available_number_for_repetition))
@@ -51,13 +51,13 @@ async def day_before_repetition_handler(message: types.Message, state: FSMContex
     data = await state.get_data()
     try:
         await change_days_before_repetition(data, message)
-        await message.answer(Russian.CHANGE_DAYS_POSITIVE)
+        await message.answer(Russian.CHANGE_POSITIVE)
         await state.clear()
     except:
-        await message.answer(Russian.CHANGE_DAYS_NEGATIVE_TEXT)
+        await message.answer(Russian.CHANGE_NEGATIVE_TEXT)
         await state.clear()
 
 
 @router.message(ChangedDaysBeforeRepetition.change)
 async def day_before_repetition_incorrectly_handler(message: types.Message):
-    await message.answer(Russian.CHANGE_DAYS_NEGATIVE_NUM)
+    await message.answer(Russian.CHANGE_NEGATIVE_NUM)

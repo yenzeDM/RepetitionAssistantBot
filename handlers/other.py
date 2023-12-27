@@ -51,9 +51,9 @@ async def command_help(message: types.Message):
 
 
 @router.message(Command("menu"))
-async def command_menu(message: types.Message):
+async def keyboard_with_commands_handler(message: types.Message):
     await update_last_activity(message)
-    await message.answer(Russian.MENU, reply_markup=await kb_for_command_menu())
+    await message.answer(Russian.KEYBOARD_WITH_COMMANDS, reply_markup=await kb_for_command_menu())
 
 
 @router.message(F.text.contains("List"))
