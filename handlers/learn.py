@@ -15,7 +15,7 @@ class LearnPhrases(StatesGroup):
 
 
 @router.message(F.text.contains('Learning'))
-async def find_phrases_for_learn(message: types.Message, state: FSMContext):
+async def learning_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
     await state.update_data(phrases_to_learn=await show_phrase_for_learn(message.from_user.id))
     data = await state.get_data()
@@ -51,7 +51,7 @@ async def translation(message: types.Message, state: FSMContext):
 
 
 @router.message(LearnPhrases.learn_phrase)
-async def learn_text(message: types.Message, state: FSMContext):
+async def text_validation_handler(message: types.Message, state: FSMContext):
     data = await state.get_data()
     if str(data['phrases_to_learn'][0][0]).strip().lower() == message.text.strip().lower():
         await change_date_for_phrase(data['phrases_to_learn'][0], message)

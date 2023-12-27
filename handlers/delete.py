@@ -6,6 +6,7 @@ from db.func_for_db import update_last_activity, show_list_of_phrases, delete_sp
 from keyboards.client_keyboards import kb_for_delete
 from create_bot import bot
 from additional_func import divide
+from language.russian import Russian
 
 
 router = Router()
@@ -17,58 +18,58 @@ class DeleteText(StatesGroup):
 
 
 @router.message(F.text.contains('Deletion'))
-async def delete_text(message: types.Message, state: FSMContext):
+async def delete_text_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
     if await show_list_of_phrases(message):
         await state.set_state(DeleteText.choose_deletion_type)
-        await message.answer('Choose type of deletion', reply_markup=await kb_for_delete())
+        await message.answer(Russian.DELETE_TEXT_TYPE_OF_DELETION, reply_markup=await kb_for_delete())
     else:
-        await message.answer('Your dictionary is empty 🗑')
+        await message.answer(Russian.DELETE_TEXT_EMPTY)
 
 
 @router.callback_query(F.data == 'delete_all')
-async def delete_all(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-    await delete_all_data_from_phrases(callback.from_user.id)
-    await callback.message.answer('✅ You deleted all phrases successful')
-    await callback.answer()
-    await state.clear()
+async def delete_all_handler(callback: types.CallbackQuery, state: FSMContext):
+    if show_list_of_phrases(callback):
+        await callback.message.delete()
+        await delete_all_data_from_phrases(callback.from_user.id)
+        await callback.message.answer(Russian.DELETE_ALL_POSITIVE)
+        await callback.answer()
+        await state.clear()
 
 
 @router.callback_query(F.data == 'delete_several')
-async def delete_several(callback: types.CallbackQuery, state: FSMContext):
-    await bot.send_message(callback.from_user.id, 'To cancel command, you should enter⚠️ /cancel\n\n✍Enter several phrases to delete separated by commas _(Enter the text that you added in the first step of the "Add text" command.)_:', parse_mode='Markdown')
+async def delete_several_handler(callback: types.CallbackQuery, state: FSMContext):
+    await bot.send_message(callback.from_user.id, Russian.DELETE_SEVERAL_TEXT_TO_REPEAT, parse_mode='Markdown')
     await callback.message.delete()
     await state.update_data(deletion_type=callback.data)
     await callback.answer()
 
 
 @router.callback_query(F.data == 'delete_one')
-async def delete_one(callback: types.CallbackQuery, state: FSMContext):
+async def delete_one_handler(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer('To cancel command, you should enter⚠️ /cancel\n\n✍️Enter the text that you want to delete _(Enter the text that you added in the first step of the "Add text" command.)_:', parse_mode='Markdown')
+    await callback.message.answer(Russian.DELETE_ONE_TEXT_TO_REPEAT, parse_mode='Markdown')
     await state.update_data(deletion_type=callback.data)
     await callback.answer()
 
 
 @router.message(DeleteText.choose_deletion_type)
-async def delete_text(message: types.Message, state: FSMContext):
+async def finish_delete_text_handler(message: types.Message, state: FSMContext):
     deletion_type = await state.get_data()
     if deletion_type['deletion_type'] == 'delete_several':
         try:
             phrases_for_deletion = await divide(message.text, ',')
             await delete_several_phrases(phrases_for_deletion, message)
-            await message.answer('✅ Deletion successful')
+            await message.answer(Russian.DELETE_SEVERAL_POSITIVE)
             await state.clear()
         except:
-            await message.answer(
-                '❌ An error occurred, please check if all the phrases are separated by commas and if they are in your dictionary.')
+            await message.answer(Russian.DELETE_SEVERAL_NEGATIVE)
             await state.clear()
     elif deletion_type['deletion_type'] == 'delete_one':
         try:
             await delete_specific_phrase(message)
-            await message.answer('✅ Deletion successful')
+            await message.answer(Russian.DELETE_ONE_POSITIVE)
             await state.clear()
         except:
-            await message.answer('❌ You do not have it in your dictionary')
+            await message.answer(Russian.DELETE_ONE_NEGATIVE)
             await state.clear()
