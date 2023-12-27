@@ -5,61 +5,62 @@ from aiogram import types
 from db.func_for_db import update_last_activity, show_phrase_for_learn, change_date_for_phrase
 from additional_func import handler_for_show_list
 from asyncio import sleep
+from language.russian import Russian
 
 
 router = Router()
 
 
 class LearnPhrases(StatesGroup):
-    learn_phrase = State()
+    learn = State()
 
 
 @router.message(F.text.contains('Learning'))
-async def learning_handler(message: types.Message, state: FSMContext):
+async def learn_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
-    await state.update_data(phrases_to_learn=await show_phrase_for_learn(message.from_user.id))
+    await state.update_data(text_to_repeat=await show_phrase_for_learn(message.from_user.id))
     data = await state.get_data()
-    if data['phrases_to_learn']:
-        await state.set_state(LearnPhrases.learn_phrase)
-        if len(data['phrases_to_learn']) > 100:
-            tmp = data['phrases_to_learn'].copy()
-            await message.answer(f'To cancel command, you should enter⚠️ /cancel\n\n🧾 Today you need repeat:')
+    if data['text_to_repeat']:
+        await state.set_state(LearnPhrases.learn)
+        if len(data['text_to_repeat']) > 100:
+            tmp = data['text_to_repeat'].copy()
+            await message.answer(Russian.LEARN_NEED)
             await sleep(0.5)
             while tmp:
-                await message.answer(await handler_for_show_list(tmp[0:99], translation=True))
+                await message.answer(await handler_for_show_list(tmp[0:99], text_to_repeat_handler=True))
                 await sleep(0.5)
                 tmp = tmp[99::]
-            await translation(message, state)
+            await text_to_repeat_handler(message, state)
         else:
-            tmp = data['phrases_to_learn'].copy()
-            await message.answer(f'To cancel command, you should enter⚠️ /cancel\n\n🧾 Today you need repeat:\n\n{await handler_for_show_list(tmp, translation=True)}')
+            tmp = data['text_to_repeat'].copy()
+            await message.answer(f'{Russian.LEARN_NEED}\n\n{await handler_for_show_list(tmp, text_to_repeat_handler=True)}')
             await sleep(0.5)
-            await translation(message, state)
+            await text_to_repeat_handler(message, state)
     else:
-        await message.answer('You have nothing for repetition 🗑')
+        await message.answer(Russian.LEARN_EMPTY)
         await state.clear()
 
 
-async def translation(message: types.Message, state: FSMContext):
+async def text_to_repeat_handler(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    if data['phrases_to_learn']:
-        await message.answer(f"{data['phrases_to_learn'][0][1]}\n\n🖌 Enter the answer:")
-        await state.set_state(LearnPhrases.learn_phrase)
+    if data['text_to_repeat']:
+        await message.answer(f"{data['text_to_repeat'][0][1]}\n\n{Russian.LEARN_TEXT_TO_REPEAT}")
+        await state.set_state(LearnPhrases.learn)
     else:
-        await message.answer("That's all for today 👏")
+        await message.answer(Russian.FINISH_LEARN_TEXT_TO_REPEAT)
         await state.clear()
 
 
-@router.message(LearnPhrases.learn_phrase)
+@router.message(LearnPhrases.learn)
 async def text_validation_handler(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    if str(data['phrases_to_learn'][0][0]).strip().lower() == message.text.strip().lower():
-        await change_date_for_phrase(data['phrases_to_learn'][0], message)
-        await state.update_data(phrases_to_learn=data['phrases_to_learn'][1::])
-        await message.answer('✅ Your answer is right')
+    if str(data['text_to_repeat'][0][0]).strip().lower() == message.text.strip().lower():
+        await change_date_for_phrase(data['text_to_repeat'][0], message)
+        await state.update_data(text_to_repeat=data['text_to_repeat'][1::])
+        await message.answer(Russian.LEARN_TEXT_TO_REPEAT_POSITIVE)
         await sleep(0.5)
-        await translation(message, state)
+        await text_to_repeat_handler(message, state)
     else:
-        await message.answer('❌ Your answer is wrong')
+        await message.answer(Russian.LEARN_TEXT_TO_REPEAT_NEGATIVE)
         await sleep(0.5)
-        await translation(message, state)
+        await text_to_repeat_handler(message, state)
