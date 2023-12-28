@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
-from db.func_for_db import update_last_activity, show_list_of_phrases, delete_specific_phrase, delete_all_data_from_phrases, delete_several_phrases
+from db.func_for_db import update_last_activity, show_list_of_phrases, delete_one, delete_all_data_from_phrases, delete_several
 from keyboards.client_keyboards import kb_for_delete
 from create_bot import bot
 from additional_func import divide
@@ -59,7 +59,7 @@ async def finish_delete_text_handler(message: types.Message, state: FSMContext):
     if deletion_type['deletion_type'] == 'delete_several':
         try:
             phrases_for_deletion = await divide(message.text, ',')
-            await delete_several_phrases(phrases_for_deletion, message)
+            await delete_several(phrases_for_deletion, message)
             await message.answer(Russian.DELETE_SEVERAL_POSITIVE)
             await state.clear()
         except:
@@ -67,7 +67,7 @@ async def finish_delete_text_handler(message: types.Message, state: FSMContext):
             await state.clear()
     elif deletion_type['deletion_type'] == 'delete_one':
         try:
-            await delete_specific_phrase(message)
+            await delete_one(message)
             await message.answer(Russian.DELETE_ONE_POSITIVE)
             await state.clear()
         except:

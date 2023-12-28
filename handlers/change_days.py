@@ -4,7 +4,7 @@ from aiogram import types
 from db.func_for_db import update_last_activity, show_list_of_phrases, change_days_before_repetition
 from aiogram import Router, F
 from asyncio import sleep
-from additional_func import handler_for_show_list
+from additional_func import change_list_output
 from language.russian import Russian
 
 
@@ -25,12 +25,12 @@ async def change_handler(message: types.Message, state: FSMContext):
     if all_phrases:
         if len(all_phrases) > 100:
             while all_phrases:
-                await message.answer(await handler_for_show_list(all_phrases[0:99], translation=True, days=True))
+                await message.answer(await change_list_output(all_phrases[0:99], help_text=True, days=True))
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
             await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
         else:
-            await message.answer(await handler_for_show_list(all_phrases, translation=True, days=True))
+            await message.answer(await change_list_output(all_phrases, help_text=True, days=True))
             await sleep(0.5)
             await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
     else:

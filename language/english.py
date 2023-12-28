@@ -20,8 +20,8 @@ class English:
     DELETE_TEXT_TYPE_OF_DELETION = 'To cancel the command, press ⚠️/cancel\n\nChoose type of deletion 🫡'
     DELETE_TEXT_EMPTY = 'Your dictionary is empty 🗑'
     DELETE_ALL_POSITIVE = '✅ You deleted all phrases successful'
-    DELETE_SEVERAL_TEXT_TO_REPEAT = 'To cancel the command, press ⚠️/cancel\n\n✍ Enter several phrases to delete separated by commas.\n\n_*Enter the text that you added in the first step of the *Addition* command."_:'
-    DELETE_ONE_TEXT_TO_REPEAT = 'To cancel the command, press ⚠️/cancel\n\n✍️ Enter the text that you want to delete.\n\n_"Enter the text that you added in the first step of the *Addition* command."_:'
+    DELETE_SEVERAL_TEXT_TO_REPEAT = 'To cancel the command, press ⚠️/cancel\n\n✍ Enter several phrases to delete separated by commas.\n\n_*Enter the text that you added in the first step of the Addition command."_:'
+    DELETE_ONE_TEXT_TO_REPEAT = 'To cancel the command, press ⚠️/cancel\n\n✍️ Enter the text that you want to delete.\n\n_"Enter the text that you added in the first step of the Addition command."_:'
     DELETE_SEVERAL_POSITIVE = '✅ Deletion successful'
     DELETE_SEVERAL_NEGATIVE = '❌ An error occurred, please check if all the phrases are separated by commas and if they are in your dictionary.'
     DELETE_ONE_POSITIVE = '✅ Deletion successful'
@@ -33,3 +33,26 @@ class English:
     FINISH_LEARN_TEXT_TO_REPEAT = "That's all for today 👏"
     LEARN_TEXT_TO_REPEAT_POSITIVE = '✅ Your answer is right'
     LEARN_TEXT_TO_REPEAT_NEGATIVE = '❌ Your answer is wrong'
+    # other.py
+    START = '''👋 Hello, I'm your <b>repetition assistant</b>.
+
+▪️Enter the command /keyboard_with_commands to start adding and learning. 
+
+▪️Use the /help command to see <b>all available commands</b> and <b>their descriptions</b>.'''
+    HELP = '''🔻 /start - start the bot.
+🔸 /help - desctiption of commands.
+🔹 /keyboard_with_commands - call the keyboard with the main commands.
+▫️ /cancel - cancel the action.
+
+<b>Description of main commands:</b>
+
+📓 <b>Learning</b> - start learning. You can use this command by typing <b>"Learning"</b> in the chat with the bot.
+
+🧾 <b>List of phrases</b> - shows everything you have added. You can use this command by typing <b>"List"</b> in the chat with the bot.
+
+🎲 <b>Change days before repetition</b> - change days. You can use this command by typing <b>"Change"</b> in the chat with the bot.
+
+📨 <b>Addititon</b> - add educational material to your dictionary. You can use this command by typing <b>"Addition"</b> in the chat with the bot.
+
+✂️ <b>Deletion</b> - delete educational material from your dictionary. You can use this command by typing <b>"Deletion"</b> in the chat with the bot.'''
+    LIST = 'You have nothing in your dictionary 🗑'

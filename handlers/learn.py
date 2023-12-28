@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
 from db.func_for_db import update_last_activity, show_phrase_for_learn, change_date_for_phrase
-from additional_func import handler_for_show_list
+from additional_func import change_list_output
 from asyncio import sleep
 from language.russian import Russian
 
@@ -27,13 +27,13 @@ async def learn_handler(message: types.Message, state: FSMContext):
             await message.answer(Russian.LEARN_NEED)
             await sleep(0.5)
             while tmp:
-                await message.answer(await handler_for_show_list(tmp[0:99], text_to_repeat_handler=True))
+                await message.answer(await change_list_output(tmp[0:99], help_text=True))
                 await sleep(0.5)
                 tmp = tmp[99::]
             await text_to_repeat_handler(message, state)
         else:
             tmp = data['text_to_repeat'].copy()
-            await message.answer(f'{Russian.LEARN_NEED}\n\n{await handler_for_show_list(tmp, text_to_repeat_handler=True)}')
+            await message.answer(f'{Russian.LEARN_NEED}\n\n{await change_list_output(tmp, help_text=True)}')
             await sleep(0.5)
             await text_to_repeat_handler(message, state)
     else:

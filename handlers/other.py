@@ -1,53 +1,31 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram import types
-from db.func_for_db import add_user_id_in_db, update_last_activity, show_list_of_phrases, delete_all_data_from_phrases
+from db.func_for_db import add_user_id_in_db, update_last_activity, show_list_of_phrases
 from keyboards.client_keyboards import kb_for_command_menu
-from additional_func import handler_for_show_list
+from additional_func import change_list_output
 from asyncio import sleep
 from language.russian import Russian
 
 
 router = Router()
+# Доделать update_last_activity
+date_of_last_activity = ''
 
 
 @router.message(Command("start"))
-async def command_start(message: types.Message):
+async def start_handler(message: types.Message):
     try:
         add_user_id_in_db(message)
-        await message.answer("""👋 Hello, I'm your <b>Repetition Assistant</b>.
-
-▪️To start adding your any text, you need to enter the /menu command. 
-
-▪️Use the /help command to see <b>all available commands</b> and <b>their detailed descriptions</b>.""", parse_mode='HTML')
+        await message.answer(Russian.START, parse_mode='HTML')
     except:
         await update_last_activity(message)
-        await message.answer("""👋 Hello, I'm your <b>Repetition Assistant</b>.
-
-▪️To start adding your any text, you need to enter the /menu command. 
-
-▪️Use the /help command to see <b>all available commands</b> and <b>their detailed descriptions</b>.""", parse_mode='HTML')
+        await message.answer(Russian.START, parse_mode='HTML')
 
 
 @router.message(Command("help"))
-async def command_help(message: types.Message):
-    await message.answer('''🔻 /start - start the bot.
-🔸 /help - detailed instructions.
-🔹 /menu - call the menu with the main commands.
-▪️ /delete_all - delete all text from the dictionary.
-▫️ /cancel - cancel the action of the command located in the menu.
-
-<b>Description of commands from the menu:</b>
-
-📓 <b>Learning</b> - start learning. You can also use this command by typing <b>"Learning"</b> in the chat with the bot.
-
-🧾 <b>List of phrases</b> - shows everything you have added. You can also use this command by typing <b>"List"</b> in the chat with the bot.
-
-🎲 <b>Change days before repetition</b> - changes the days for a specific text you have added. You can also use this command by typing <b>"Change"</b> in the chat with the bot.
-
-📨 <b>Add phrase</b> - adding text to your dictionary with the indication of how many days should pass before repetition. You can also use this command by typing <b>"Add"</b> in the chat with the bot.
-
-✂️ <b>Delete phrase</b> - delete a specific phrase or word from your dictionary. You can also use this command by typing <b>"Delete"</b> in the chat with the bot.''', parse_mode='HTML')
+async def help_handler(message: types.Message):
+    await message.answer(Russian.HELP, parse_mode='HTML')
 
 
 @router.message(Command("menu"))
@@ -57,22 +35,22 @@ async def keyboard_with_commands_handler(message: types.Message):
 
 
 @router.message(F.text.contains("List"))
-async def command_show(message: types.Message):
+async def show_list_handler(message: types.Message):
     await update_last_activity(message)
     try:
         all_phrases = await show_list_of_phrases(message)
         if len(all_phrases) > 100:
             while all_phrases:
-                await message.answer(await handler_for_show_list(all_phrases[0:99], phrase=True, translation=True, days=True), parse_mode='Markdown')
+                await message.answer(await change_list_output(all_phrases[0:99], text_to_repeat=True, help_text=True, days=True), parse_mode='Markdown')
                 await sleep(0.5)
                 all_phrases = all_phrases[99::]
         else:
-            await message.answer(await handler_for_show_list(all_phrases, phrase=True, translation=True, days=True), parse_mode='Markdown')
+            await message.answer(await change_list_output(all_phrases, text_to_repeat=True, help_text=True, days=True), parse_mode='Markdown')
     except:
-        await message.answer('You have nothing in your dictionary 🗑')
+        await message.answer(Russian.LIST_EMPTY)
 
 
 @router.message(F.text)
-async def spam(message: types.Message):
+async def spam_handler(message: types.Message):
     await update_last_activity(message)
     await message.delete()

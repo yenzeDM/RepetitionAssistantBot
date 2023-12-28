@@ -21,21 +21,21 @@ def db_finish():
 
 
 # add.py
-async def add_data_in_db(data):
+async def add_data(data):
     cur.execute('INSERT INTO phrases VALUES (?, ?, ?, ?, ?)',
                 (data['user_tg_id'], data['phrase'], data['translation'], data['date_of_addition'], data['days_before_repetition'],))
     base.commit()
 
 
 # delete.py
-async def delete_specific_phrase(message):
+async def delete_one(message):
     cur.execute('DELETE FROM phrases WHERE phrase == ? and user_tg_id == ?',
                 (message.text.lower(), message.from_user.id,))
     base.commit()
 
 
 # delete.py
-async def delete_several_phrases(list, message):
+async def delete_several(list, message):
     while list:
         cur.execute('DELETE FROM phrases WHERE phrase == ? and user_tg_id == ?',
                     (list[0], message.from_user.id,))

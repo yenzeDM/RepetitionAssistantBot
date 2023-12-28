@@ -2,11 +2,11 @@ import datetime
 
 
 # other.py, learn.py, change_days.py
-async def handler_for_show_list(list, phrase=None, translation=None, date=None, days=None):
+async def change_list_output(list, text_to_repeat=None, help_text=None, date=None, days=None):
     result = []
     output_values = {
-        'phrase': phrase,
-        'translation': translation,
+        'text_to_repeat': text_to_repeat,
+        'help_text': help_text,
         'date': date,
         'days': days,
     }

@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
 from datetime import date
-from db.func_for_db import add_data_in_db, update_last_activity
+from db.func_for_db import add_data, update_last_activity
 from aiogram import Router, F
 from language.russian import Russian
 from keyboards.client_keyboards import kb_for_add, kb_for_command_menu
@@ -46,7 +46,7 @@ async def day_before_repetition_handler(message: types.Message, state: FSMContex
     await state.update_data(days_before_repetition=int(message.text.strip()))
     data = await state.get_data()
 
-    await add_data_in_db(data)
+    await add_data(data)
     await message.answer(Russian.ADD_POSITIVE, reply_markup=await kb_for_add())
     await state.clear()
 
