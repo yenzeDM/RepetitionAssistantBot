@@ -13,29 +13,29 @@ router = Router()
 
 
 class AddText(StatesGroup):
-    phrase = State()
+    text_to_repeat = State()
+    help_text = State()
     days_before_repetition = State()
-    translation = State()
 
 
 @router.message(F.text.contains('Addition'))
 async def addition_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
-    await state.set_state(AddText.phrase)
+    await state.set_state(AddText.text_to_repeat)
     await message.answer(Russian.ADD_TEXT_TO_REPEAT, parse_mode='Markdown')
 
 
-@router.message(AddText.phrase)
+@router.message(AddText.text_to_repeat)
 async def text_to_repeat_handler(message: types.Message, state: FSMContext):
     await state.update_data(user_tg_id=message.from_user.id)
-    await state.update_data(phrase=message.text.lower())
-    await state.set_state(AddText.translation)
+    await state.update_data(text_to_repeat=message.text.lower())
+    await state.set_state(AddText.help_text)
     await message.answer(Russian.ADD_HELP_TEXT, parse_mode='Markdown')
 
 
-@router.message(AddText.translation)
+@router.message(AddText.help_text)
 async def help_text_handler(message: types.Message, state: FSMContext):
-    await state.update_data(translation=message.text.lower())
+    await state.update_data(help_text=message.text.lower())
     await state.update_data(date_of_addition=str(date.today()))
     await state.set_state(AddText.days_before_repetition)
     await message.answer(Russian.ADD_DAYS_BEFORE_REPETITION)
@@ -56,7 +56,7 @@ async def day_before_repetition_incorrectly_handler(message: types.Message):
     await message.answer(Russian.ADD_NEGATIVE)
 
 
-@router.callback_query(F.data == 'menu')
+@router.callback_query(F.data == 'keyboard_with_commands')
 async def keyboard_with_commands_handler(callback: types.callback_query):
     await callback.message.answer(Russian.KEYBOARD_WITH_COMMANDS, reply_markup=await kb_for_command_menu())
     await callback.answer()

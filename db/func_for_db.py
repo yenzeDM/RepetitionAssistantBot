@@ -10,7 +10,7 @@ def db_start():
     base = sq.connect('bot.db')
     base.execute(
         'CREATE TABLE IF NOT EXISTS users(user_tg_id INTEGER PRIMARY KEY, last_activity TEXT)')
-    base.execute('CREATE TABLE IF NOT EXISTS phrases(user_tg_id INTEGER, phrase TEXT, translation TEXT, date_of_addition TEXT, days_before_repetition INTEGER, FOREIGN KEY (user_tg_id) REFERENCES users (user_tg_id))')
+    base.execute('CREATE TABLE IF NOT EXISTS material(user_tg_id INTEGER, text_to_repeat TEXT, help_text TEXT, date_of_addition TEXT, days_before_repetition INTEGER, FOREIGN KEY (user_tg_id) REFERENCES users (user_tg_id))')
     base.commit()
     cur = base.cursor()
 
@@ -22,14 +22,14 @@ def db_finish():
 
 # add.py
 async def add_data(data):
-    cur.execute('INSERT INTO phrases VALUES (?, ?, ?, ?, ?)',
-                (data['user_tg_id'], data['phrase'], data['translation'], data['date_of_addition'], data['days_before_repetition'],))
+    cur.execute('INSERT INTO material VALUES (?, ?, ?, ?, ?)',
+                (data['user_tg_id'], data['text_to_repeat'], data['help_text'], data['date_of_addition'], data['days_before_repetition'],))
     base.commit()
 
 
 # delete.py
 async def delete_one(message):
-    cur.execute('DELETE FROM phrases WHERE phrase == ? and user_tg_id == ?',
+    cur.execute('DELETE FROM material WHERE text_to_repeat == ? and user_tg_id == ?',
                 (message.text.lower(), message.from_user.id,))
     base.commit()
 
@@ -37,36 +37,36 @@ async def delete_one(message):
 # delete.py
 async def delete_several(list, message):
     while list:
-        cur.execute('DELETE FROM phrases WHERE phrase == ? and user_tg_id == ?',
+        cur.execute('DELETE FROM material WHERE text_to_repeat == ? and user_tg_id == ?',
                     (list[0], message.from_user.id,))
         list = list[1::]
     base.commit()
 
 
 # delete.py
-async def delete_all_data_from_phrases(id):
-    cur.execute('DELETE FROM phrases WHERE user_tg_id == ?', (id,))
+async def delete_all(id):
+    cur.execute('DELETE FROM material WHERE user_tg_id == ?', (id,))
     base.commit()
 
 
 # changed_days.py, delete.py, other.py
-async def show_list_of_phrases(message):
-    list = cur.execute('SELECT phrase, translation, date_of_addition, days_before_repetition FROM phrases WHERE user_tg_id == ?',
+async def show_all_added_material(message):
+    list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
                        (message.from_user.id,)).fetchall()
     return list
 
 
 # learn.py bot.py
-async def show_phrase_for_learn(id):
-    list = cur.execute('SELECT phrase, translation, date_of_addition, days_before_repetition FROM phrases WHERE user_tg_id == ?',
+async def show_finished_text_to_repeat(id):
+    list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
                        (id,)).fetchall()
     result = await check_text_to_repeat(list)
     return result
 
 
 # learn.py
-async def change_date_for_phrase(data, message):
-    cur.execute('UPDATE phrases SET date_of_addition == ? WHERE phrase == ? and user_tg_id == ?',
+async def change_date(data, message):
+    cur.execute('UPDATE material SET date_of_addition == ? WHERE text_to_repeat == ? and user_tg_id == ?',
                 (str(datetime.date.today()), data[0], message.from_user.id,))
     base.commit()
 
@@ -76,6 +76,7 @@ async def update_last_activity(message):
     cur.execute('UPDATE users SET last_activity == ? WHERE user_tg_id == ?',
                 (str(datetime.date.today()), message.from_user.id,))
     base.commit()
+    return str(datetime.date.today())
 
 
 # bot.py
@@ -87,25 +88,25 @@ async def get_users_activity():
 
 # bot.py
 async def delete_all_user_data(user_id):
-    cur.execute('DELETE FROM phrases WHERE user_tg_id == ?', (user_id,))
+    cur.execute('DELETE FROM material WHERE user_tg_id == ?', (user_id,))
     cur.execute('DELETE FROM users WHERE user_tg_id == ?', (user_id,))
     base.commit()
 
 
 # changed_days.py
 async def change_days_before_repetition(data, message):
-    list = [translation[0] for translation in cur.execute(
-        'SELECT translation FROM phrases WHERE user_tg_id == ?', (message.from_user.id,)).fetchall()]
-    if data['translation'] in list:
-        cur.execute('UPDATE phrases SET days_before_repetition = ? WHERE translation = ?',
-                    (data['days_before_repetition'], data['translation'],))
+    list = [help_text[0] for help_text in cur.execute(
+        'SELECT help_text FROM material WHERE user_tg_id == ?', (message.from_user.id,)).fetchall()]
+    if data['help_text'] in list:
+        cur.execute('UPDATE material SET days_before_repetition = ? WHERE help_text = ?',
+                    (data['days_before_repetition'], data['help_text'],))
         base.commit()
     else:
         raise ValueError
 
 
 # other.py
-async def add_user_id_in_db(message):
+async def add_user_id(message):
     cur.execute(
         'INSERT INTO users VALUES(?, ?)', (message.from_user.id, str(date.today())))
     base.commit()

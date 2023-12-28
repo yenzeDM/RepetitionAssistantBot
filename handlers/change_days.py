@@ -1,7 +1,7 @@
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
-from db.func_for_db import update_last_activity, show_list_of_phrases, change_days_before_repetition
+from db.func_for_db import update_last_activity, show_all_added_material, change_days_before_repetition
 from aiogram import Router, F
 from asyncio import sleep
 from additional_func import change_list_output
@@ -13,24 +13,24 @@ router = Router()
 
 
 class ChangedDaysBeforeRepetition(StatesGroup):
-    phrase = State()
+    text_to_repeat = State()
     change = State()
 
 
 @router.message(F.text.contains('Change'))
 async def change_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
-    await state.set_state(ChangedDaysBeforeRepetition.phrase)
-    all_phrases = await show_list_of_phrases(message)
-    if all_phrases:
-        if len(all_phrases) > 100:
-            while all_phrases:
-                await message.answer(await change_list_output(all_phrases[0:99], help_text=True, days=True))
+    await state.set_state(ChangedDaysBeforeRepetition.text_to_repeat)
+    all_material = await show_all_added_material(message)
+    if all_material:
+        if len(all_material) > 100:
+            while all_material:
+                await message.answer(await change_list_output(all_material[0:99], help_text=True, days=True))
                 await sleep(0.5)
-                all_phrases = all_phrases[99::]
+                all_material = all_material[99::]
             await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
         else:
-            await message.answer(await change_list_output(all_phrases, help_text=True, days=True))
+            await message.answer(await change_list_output(all_material, help_text=True, days=True))
             await sleep(0.5)
             await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
     else:
@@ -38,9 +38,9 @@ async def change_handler(message: types.Message, state: FSMContext):
         await state.clear()
 
 
-@router.message(ChangedDaysBeforeRepetition.phrase)
+@router.message(ChangedDaysBeforeRepetition.text_to_repeat)
 async def help_text_handler(message: types.Message, state: FSMContext):
-    await state.update_data(translation=message.text.lower())
+    await state.update_data(help_text=message.text.lower())
     await state.set_state(ChangedDaysBeforeRepetition.change)
     await message.answer(Russian.CHANGE_DAYS_BEFORE_REPETITION)
 

@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
-from db.func_for_db import update_last_activity, show_phrase_for_learn, change_date_for_phrase
+from db.func_for_db import update_last_activity, show_finished_text_to_repeat, change_date
 from additional_func import change_list_output
 from asyncio import sleep
 from language.russian import Russian
@@ -18,7 +18,7 @@ class LearnPhrases(StatesGroup):
 @router.message(F.text.contains('Learning'))
 async def learn_handler(message: types.Message, state: FSMContext):
     await update_last_activity(message)
-    await state.update_data(text_to_repeat=await show_phrase_for_learn(message.from_user.id))
+    await state.update_data(text_to_repeat=await show_finished_text_to_repeat(message.from_user.id))
     data = await state.get_data()
     if data['text_to_repeat']:
         await state.set_state(LearnPhrases.learn)
@@ -55,7 +55,7 @@ async def text_to_repeat_handler(message: types.Message, state: FSMContext):
 async def text_validation_handler(message: types.Message, state: FSMContext):
     data = await state.get_data()
     if str(data['text_to_repeat'][0][0]).strip().lower() == message.text.strip().lower():
-        await change_date_for_phrase(data['text_to_repeat'][0], message)
+        await change_date(data['text_to_repeat'][0], message)
         await state.update_data(text_to_repeat=data['text_to_repeat'][1::])
         await message.answer(Russian.LEARN_TEXT_TO_REPEAT_POSITIVE)
         await sleep(0.5)
