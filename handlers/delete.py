@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
-from db.func_for_db import update_last_activity, show_all_added_material, delete_one, delete_all, delete_several
+from db.func_for_db import show_all_added_material, delete_one, delete_all, delete_several
 from keyboards.client_keyboards import kb_for_delete
 from create_bot import bot
 from additional_func import divide
@@ -18,7 +18,6 @@ class DeleteText(StatesGroup):
 
 @router.message(F.text.contains('Deletion'))
 async def delete_text_handler(message: types.Message, state: FSMContext):
-    await update_last_activity(message)
     if await show_all_added_material(message):
         await state.set_state(DeleteText.choose_deletion_type)
         await message.answer(Russian.DELETE_TEXT_TYPE_OF_DELETION, reply_markup=await kb_for_delete())

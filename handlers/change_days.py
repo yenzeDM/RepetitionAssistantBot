@@ -1,7 +1,7 @@
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
-from db.func_for_db import update_last_activity, show_all_added_material, change_days_before_repetition
+from db.func_for_db import show_all_added_material, change_days_before_repetition
 from aiogram import Router, F
 from asyncio import sleep
 from additional_func import change_list_output
@@ -19,7 +19,6 @@ class ChangedDaysBeforeRepetition(StatesGroup):
 
 @router.message(F.text.contains('Change'))
 async def change_handler(message: types.Message, state: FSMContext):
-    await update_last_activity(message)
     await state.set_state(ChangedDaysBeforeRepetition.text_to_repeat)
     all_material = await show_all_added_material(message)
     if all_material:

@@ -1,6 +1,6 @@
 import sqlite3 as sq
 import datetime
-from additional_func import check_text_to_repeat
+from additional_func import check_text_to_repeat, check_text_to_repeat_for_notification
 from datetime import date
 
 
@@ -56,7 +56,7 @@ async def show_all_added_material(message):
     return list
 
 
-# learn.py bot.py
+# learn.py
 async def show_finished_text_to_repeat(id):
     list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
                        (id,)).fetchall()
@@ -76,21 +76,26 @@ async def update_last_activity(message):
     cur.execute('UPDATE users SET last_activity == ? WHERE user_tg_id == ?',
                 (str(datetime.date.today()), message.from_user.id,))
     base.commit()
-    return str(datetime.date.today())
 
 
 # bot.py
-async def get_users_activity():
+def get_users_activity():
     list = cur.execute(
         'SELECT user_tg_id, last_activity from users').fetchall()
     return list
 
 
 # bot.py
-async def delete_all_user_data(user_id):
+def delete_all_user_data(user_id):
     cur.execute('DELETE FROM material WHERE user_tg_id == ?', (user_id,))
     cur.execute('DELETE FROM users WHERE user_tg_id == ?', (user_id,))
     base.commit()
+
+
+# bot.py
+async def get_users_id():
+    list = cur.execute('SELECT user_tg_id from users').fetchall()
+    return list
 
 
 # changed_days.py

@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
 from datetime import date
-from db.func_for_db import add_data, update_last_activity
+from db.func_for_db import add_data
 from aiogram import Router, F
 from language.russian import Russian
 from keyboards.client_keyboards import kb_for_add, kb_for_command_menu
@@ -20,7 +20,6 @@ class AddText(StatesGroup):
 
 @router.message(F.text.contains('Addition'))
 async def addition_handler(message: types.Message, state: FSMContext):
-    await update_last_activity(message)
     await state.set_state(AddText.text_to_repeat)
     await message.answer(Russian.ADD_TEXT_TO_REPEAT, parse_mode='Markdown')
 

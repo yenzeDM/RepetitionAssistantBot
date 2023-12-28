@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram import types
-from db.func_for_db import add_user_id, update_last_activity, show_all_added_material
+from db.func_for_db import add_user_id, show_all_added_material, update_last_activity
 from keyboards.client_keyboards import kb_for_command_menu
 from additional_func import change_list_output
 from asyncio import sleep
@@ -17,7 +17,6 @@ async def start_handler(message: types.Message):
         add_user_id(message)
         await message.answer(Russian.START, parse_mode='HTML')
     except:
-        await update_last_activity(message)
         await message.answer(Russian.START, parse_mode='HTML')
 
 
@@ -28,7 +27,6 @@ async def help_handler(message: types.Message):
 
 @router.message(Command("keyboard_with_commands"))
 async def keyboard_with_commands_handler(message: types.Message):
-    await update_last_activity(message)
     await message.answer(Russian.KEYBOARD_WITH_COMMANDS, reply_markup=await kb_for_command_menu())
 
 
@@ -50,5 +48,4 @@ async def show_list_handler(message: types.Message):
 
 @router.message(F.text)
 async def spam_handler(message: types.Message):
-    await update_last_activity(message)
     await message.delete()
