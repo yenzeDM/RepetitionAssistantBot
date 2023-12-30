@@ -10,6 +10,7 @@ class English:
     # cancel.py
     CANCEL = '✅ Cancellation successful'
     # change_days.py
+    CHANGE_DAYS_TYPE_OF_CHANGE = ''
     CHANGE_HELP_TEXT = 'To cancel the command, press ⚠️/cancel\n\n✍️ Please copy and paste the text from the message above _(without the number of days, only the text)_ where you want to change the days until repetition:'
     CHANGE_EMPTY = 'You have nothing in your dictionary 🗑'
     CHANGE_DAYS_BEFORE_REPETITION = '✍️ Enter days before repetition from 1️⃣ to 3️⃣0️⃣:'
@@ -57,4 +58,4 @@ class English:
 ✂️ <b>Deletion</b> - delete educational material from your dictionary. You can use this command by typing <b>"Deletion"</b> in the chat with the bot.'''
     LIST = 'You have nothing in your dictionary 🗑'
     # bot.py
-    TIME_TO_REPEAT ='🔔 You have more than 20 repetitions, It is time to repeat!' 
+    TIME_TO_REPEAT = '🔔 You have more than 20 repetitions, It is time to repeat!'

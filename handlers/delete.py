@@ -27,18 +27,17 @@ async def delete_text_handler(message: types.Message, state: FSMContext):
 
 @router.callback_query(F.data == 'delete_all')
 async def delete_all_handler(callback: types.CallbackQuery, state: FSMContext):
-    if show_all_added_material(callback):
-        await callback.message.delete()
-        await delete_all(callback.from_user.id)
-        await callback.message.answer(Russian.DELETE_ALL_POSITIVE)
-        await callback.answer()
-        await state.clear()
+    await callback.message.delete()
+    await delete_all(callback.from_user.id)
+    await callback.message.answer(Russian.DELETE_ALL_POSITIVE)
+    await callback.answer()
+    await state.clear()
 
 
 @router.callback_query(F.data == 'delete_several')
 async def delete_several_handler(callback: types.CallbackQuery, state: FSMContext):
-    await bot.send_message(callback.from_user.id, Russian.DELETE_SEVERAL_TEXT_TO_REPEAT, parse_mode='Markdown')
     await callback.message.delete()
+    await callback.message.answer(Russian.DELETE_SEVERAL_TEXT_TO_REPEAT, parse_mode='Markdown')
     await state.update_data(deletion_type=callback.data)
     await callback.answer()
 

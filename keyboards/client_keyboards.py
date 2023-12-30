@@ -29,7 +29,8 @@ async def kb_for_delete():
                 text='Delete all', callback_data='delete_all'),
             InlineKeyboardButton(text='Delete several',
                                  callback_data='delete_several'),
-            InlineKeyboardButton(text='Delete one', callback_data='delete_one')
+            InlineKeyboardButton(
+                text='Delete one', callback_data='delete_one'),
         ]
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -41,6 +42,21 @@ async def kb_for_add():
         [
             InlineKeyboardButton(
                 text='Keyboard with commands', callback_data='keyboard_with_commands'),
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+
+async def kb_for_change():
+    buttons = [
+        [
+            InlineKeyboardButton(text='Change by days',
+                                 callback_data='change_by_days'),
+            InlineKeyboardButton(text='Change several',
+                                 callback_data='change_several'),
+            InlineKeyboardButton(
+                text='Change one', callback_data='change_one'),
         ]
     ]
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
