@@ -18,9 +18,9 @@ def db_start():
 
 # bot.py
 async def get_users_activity():
-    list = cur.execute(
+    tmp = cur.execute(
         'SELECT user_tg_id, last_activity from users').fetchall()
-    return list
+    return tmp
 
 
 # bot.py
@@ -32,8 +32,8 @@ async def delete_all_user_data(user_id):
 
 # bot.py
 async def get_users_id():
-    list = cur.execute('SELECT user_tg_id from users').fetchall()
-    return list
+    tmp = cur.execute('SELECT user_tg_id from users').fetchall()
+    return tmp
 
 
 # add.py
@@ -51,11 +51,11 @@ async def delete_one(message):
 
 
 # delete.py
-async def delete_several(list, message):
-    while list:
+async def delete_several(tmp, message):
+    while tmp:
         cur.execute('DELETE FROM material WHERE text_to_repeat == ? and user_tg_id == ?',
-                    (list[0], message.from_user.id,))
-        list = list[1::]
+                    (tmp[0], message.from_user.id,))
+        tmp = tmp[1::]
     base.commit()
 
 
@@ -65,26 +65,26 @@ async def delete_all(id):
     base.commit()
 
 
-# change_days.py, delete.py, other.py
-async def show_all_added_material(message):
-    list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
-                       (message.from_user.id,)).fetchall()
-    return list
-
-
-# learn.py bot.py
-async def show_finished_text_to_repeat(id):
-    list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
-                       (id,)).fetchall()
-    result = await check_text_to_repeat(list)
-    return result
-
-
 # learn.py
 async def change_date(data, message):
     cur.execute('UPDATE material SET date_of_addition == ? WHERE text_to_repeat == ? and user_tg_id == ?',
                 (str(datetime.date.today()), data[0], message.from_user.id,))
     base.commit()
+
+
+# change_days.py, delete.py, other.py
+async def show_all_added_material(message):
+    tmp = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
+                      (message.from_user.id,)).fetchall()
+    return tmp
+
+
+# learn.py bot.py
+async def show_finished_text_to_repeat(id):
+    tmp = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
+                      (id,)).fetchall()
+    result = await check_text_to_repeat(tmp)
+    return result
 
 
 # add.py, cancel.py, changed_days.py, delete.py, learn.py, other.py
@@ -94,16 +94,37 @@ async def update_last_activity(message):
     base.commit()
 
 
+# change_days.py delete.py
+async def get_text_to_repeat(message):
+    tmp = cur.execute(
+        'SELECT text_to_repeat FROM material WHERE user_tg_id == ?', (message.from_user.id,))
+    return tmp
+
+
 # change_days.py
 async def change_days_before_repetition(data, message):
-    list = [help_text[0] for help_text in cur.execute(
+    tmp = [help_text[0] for help_text in cur.execute(
         'SELECT help_text FROM material WHERE user_tg_id == ?', (message.from_user.id,)).fetchall()]
-    if data['help_text'] in list:
-        cur.execute('UPDATE material SET days_before_repetition = ? WHERE help_text = ?',
+    if data['help_text'] in tmp:
+        cur.execute('UPDATE material SET days_before_repetition == ? WHERE help_text == ?',
                     (data['days_before_repetition'], data['help_text'],))
         base.commit()
     else:
         raise ValueError
+
+
+# change_days.py
+async def change_by_days(data, message):
+    cur.execute('UPDATE material SET days_before_repetition == ? WHERE days_before_repetition == ? and user_tg_id == ?',
+                (data['new_days'], data['old_days'], message.from_user.id,))
+    base.commit()
+
+
+# change_days.py
+async def get_days_before_repetition(message):
+    tmp = cur.execute(
+        'SELECT days_before_repetition FROM material where user_tg_id ==?', (message.from_user.id,))
+    return tmp
 
 
 # other.py
