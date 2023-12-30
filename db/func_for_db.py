@@ -3,19 +3,37 @@ import datetime
 from additional_func import check_text_to_repeat
 from datetime import date
 
+
 base = sq.connect('bot.db', check_same_thread=False)
 cur = base.cursor()
 
 
 # bot.py
 def db_start():
-    # global base, cur
-    # base = sq.connect('bot.db')
     base.execute(
         'CREATE TABLE IF NOT EXISTS users(user_tg_id INTEGER PRIMARY KEY, last_activity TEXT)')
     base.execute('CREATE TABLE IF NOT EXISTS material(user_tg_id INTEGER, text_to_repeat TEXT, help_text TEXT, date_of_addition TEXT, days_before_repetition INTEGER, FOREIGN KEY (user_tg_id) REFERENCES users (user_tg_id))')
     base.commit()
-    # cur = base.cursor()
+
+
+# bot.py
+async def get_users_activity():
+    list = cur.execute(
+        'SELECT user_tg_id, last_activity from users').fetchall()
+    return list
+
+
+# bot.py
+async def delete_all_user_data(user_id):
+    cur.execute('DELETE FROM material WHERE user_tg_id == ?', (user_id,))
+    cur.execute('DELETE FROM users WHERE user_tg_id == ?', (user_id,))
+    base.commit()
+
+
+# bot.py
+async def get_users_id():
+    list = cur.execute('SELECT user_tg_id from users').fetchall()
+    return list
 
 
 # add.py
@@ -47,7 +65,7 @@ async def delete_all(id):
     base.commit()
 
 
-# changed_days.py, delete.py, other.py
+# change_days.py, delete.py, other.py
 async def show_all_added_material(message):
     list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
                        (message.from_user.id,)).fetchall()
@@ -76,27 +94,7 @@ async def update_last_activity(message):
     base.commit()
 
 
-# bot.py
-async def get_users_activity():
-    list = cur.execute(
-        'SELECT user_tg_id, last_activity from users').fetchall()
-    return list
-
-
-# bot.py
-async def delete_all_user_data(user_id):
-    cur.execute('DELETE FROM material WHERE user_tg_id == ?', (user_id,))
-    cur.execute('DELETE FROM users WHERE user_tg_id == ?', (user_id,))
-    base.commit()
-
-
-# bot.py
-async def get_users_id():
-    list = cur.execute('SELECT user_tg_id from users').fetchall()
-    return list
-
-
-# changed_days.py
+# change_days.py
 async def change_days_before_repetition(data, message):
     list = [help_text[0] for help_text in cur.execute(
         'SELECT help_text FROM material WHERE user_tg_id == ?', (message.from_user.id,)).fetchall()]
@@ -110,9 +108,6 @@ async def change_days_before_repetition(data, message):
 
 # other.py
 async def add_user_id(message):
-    try:
-        cur.execute(
-            'INSERT INTO users VALUES(?, ?)', (message.from_user.id, str(date.today()),))
-        base.commit()
-    except:
-        print('hrenaten')
+    cur.execute(
+        'INSERT INTO users VALUES(?, ?)', (message.from_user.id, str(date.today()),))
+    base.commit()
