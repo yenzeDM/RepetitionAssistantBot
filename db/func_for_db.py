@@ -1,23 +1,21 @@
 import sqlite3 as sq
 import datetime
-from additional_func import check_text_to_repeat, check_text_to_repeat_for_notification
+from additional_func import check_text_to_repeat
 from datetime import date
+
+base = sq.connect('bot.db', check_same_thread=False)
+cur = base.cursor()
 
 
 # bot.py
 def db_start():
-    global base, cur
-    base = sq.connect('bot.db')
+    # global base, cur
+    # base = sq.connect('bot.db')
     base.execute(
         'CREATE TABLE IF NOT EXISTS users(user_tg_id INTEGER PRIMARY KEY, last_activity TEXT)')
     base.execute('CREATE TABLE IF NOT EXISTS material(user_tg_id INTEGER, text_to_repeat TEXT, help_text TEXT, date_of_addition TEXT, days_before_repetition INTEGER, FOREIGN KEY (user_tg_id) REFERENCES users (user_tg_id))')
     base.commit()
-    cur = base.cursor()
-
-
-# bot.py
-def db_finish():
-    base.close()
+    # cur = base.cursor()
 
 
 # add.py
@@ -56,7 +54,7 @@ async def show_all_added_material(message):
     return list
 
 
-# learn.py
+# learn.py bot.py
 async def show_finished_text_to_repeat(id):
     list = cur.execute('SELECT text_to_repeat, help_text, date_of_addition, days_before_repetition FROM material WHERE user_tg_id == ?',
                        (id,)).fetchall()
@@ -79,14 +77,14 @@ async def update_last_activity(message):
 
 
 # bot.py
-def get_users_activity():
+async def get_users_activity():
     list = cur.execute(
         'SELECT user_tg_id, last_activity from users').fetchall()
     return list
 
 
 # bot.py
-def delete_all_user_data(user_id):
+async def delete_all_user_data(user_id):
     cur.execute('DELETE FROM material WHERE user_tg_id == ?', (user_id,))
     cur.execute('DELETE FROM users WHERE user_tg_id == ?', (user_id,))
     base.commit()
@@ -112,6 +110,9 @@ async def change_days_before_repetition(data, message):
 
 # other.py
 async def add_user_id(message):
-    cur.execute(
-        'INSERT INTO users VALUES(?, ?)', (message.from_user.id, str(date.today())))
-    base.commit()
+    try:
+        cur.execute(
+            'INSERT INTO users VALUES(?, ?)', (message.from_user.id, str(date.today()),))
+        base.commit()
+    except:
+        print('hrenaten')

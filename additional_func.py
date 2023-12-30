@@ -45,6 +45,7 @@ async def check_text_to_repeat(all_user_phrases):
     return result
 
 
+# delete.py
 async def divide(str, delimiter):
     result = []
     tmp = ''

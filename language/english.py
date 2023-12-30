@@ -56,3 +56,5 @@ class English:
 
 ✂️ <b>Deletion</b> - delete educational material from your dictionary. You can use this command by typing <b>"Deletion"</b> in the chat with the bot.'''
     LIST = 'You have nothing in your dictionary 🗑'
+    # bot.py
+    TIME_TO_REPEAT ='🔔 You have more than 20 repetitions, It is time to repeat!' 

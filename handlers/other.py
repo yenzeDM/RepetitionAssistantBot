@@ -14,7 +14,7 @@ router = Router()
 @router.message(Command("start"))
 async def start_handler(message: types.Message):
     try:
-        add_user_id(message)
+        await add_user_id(message)
         await message.answer(Russian.START, parse_mode='HTML')
     except:
         await message.answer(Russian.START, parse_mode='HTML')
