@@ -6,7 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 load_dotenv()
 
-Token = os.getenv('TOKEN_TEST')
+Token = os.getenv('TOKEN')
 bot = Bot(Token)
 dp = Dispatcher()
 scheduler = AsyncIOScheduler()

@@ -1,10 +1,9 @@
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import StatesGroup, State
 from aiogram import types
-from db.func_for_db import show_all_added_material, change_days_before_repetition, change_by_days, get_days_before_repetition
+from db.func_for_db import show_all_added_material, change_by_days, get_days_before_repetition, get_text_to_repeat, change_several, change_one
 from aiogram import Router, F
-from asyncio import sleep
-from additional_func import change_list_output, divide
+from additional_func import divide
 from language.russian import Russian
 from keyboards.client_keyboards import kb_for_change
 
@@ -40,7 +39,7 @@ async def change_by_days_handler(callback: types.CallbackQuery, state: FSMContex
 @router.callback_query(F.data == 'change_several')
 async def change_several_handler(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer(Russian.CHANGE_SEVERAL)
+    await callback.message.answer(Russian.CHANGE_DAYS_BEFORE_REPETITION)
     await state.update_data(change_type=callback.data)
     await callback.answer()
 
@@ -48,7 +47,7 @@ async def change_several_handler(callback: types.CallbackQuery, state: FSMContex
 @router.callback_query(F.data == 'change_one')
 async def change_one_handler(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
-    await callback.message.answer(Russian.CHANGE_ONE)
+    await callback.message.answer(Russian.CHANGE_DAYS_BEFORE_REPETITION)
     await state.update_data(change_type=callback.data)
     await callback.answer()
 
@@ -58,15 +57,33 @@ async def change_days_type_handler(message: types.Message, state: FSMContext):
     change_type = await state.get_data()
     if change_type['change_type'] == 'change_by_days':
         old_days_in_dictionary = [i[0] for i in await get_days_before_repetition(message)]
-        if int(message.text.strip()) in old_days_in_dictionary:
-            await state.update_data(old_days=int(message.text.strip()))
-            await state.set_state(ChangeDaysBeforeRepetition.change_by_days)
-            await message.answer(Russian.CHANGE_BY_DAYS_NEW)
-        else:
+        try:
+            if int(message.text.strip()) in old_days_in_dictionary:
+                await state.update_data(old_days=int(message.text.strip()))
+                await state.set_state(ChangeDaysBeforeRepetition.change_by_days)
+                await message.answer(Russian.CHANGE_DAYS_BEFORE_REPETITION)
+            else:
+                await message.answer(Russian.CHANGE_BY_DAYS_NEGATIVE)
+                await state.clear()
+        except:
             await message.answer(Russian.CHANGE_BY_DAYS_NEGATIVE)
             await state.clear()
     if change_type['change_type'] == 'change_several':
-        phrases_for_change = await divide(message.text, ',')
+        if message.text.strip() in available_number_for_repetition:
+            await state.update_data(new_days=int(message.text.strip()))
+            await state.set_state(ChangeDaysBeforeRepetition.change_several)
+            await message.answer(Russian.CHANGE_SEVERAL, parse_mode='Markdown')
+        else:
+            await message.answer(Russian.CHANGE_SEVERAL_NEGATIVE_NUM)
+            await state.clear()
+    if change_type['change_type'] == 'change_one':
+        if message.text.strip() in available_number_for_repetition:
+            await state.update_data(new_days=int(message.text.strip()))
+            await state.set_state(ChangeDaysBeforeRepetition.change_one)
+            await message.answer(Russian.CHANGE_ONE, parse_mode='Markdown')
+        else:
+            await message.answer(Russian.CHANGE_ONE_NEGATIVE_NUM)
+            await state.clear()
 
 
 @router.message(ChangeDaysBeforeRepetition.change_by_days, F.text.in_(available_number_for_repetition))
@@ -80,48 +97,35 @@ async def finish_change_by_days_handler(message: types.Message, state: FSMContex
 
 @router.message(ChangeDaysBeforeRepetition.change_by_days)
 async def finish_change_by_days_incorrectly_handler(message: types.Message):
-    await message.answer(Russian.CHANGE_NEGATIVE_NUM)
-
-# @router.message(F.text.contains('Change'))
-# async def change_handler(message: types.Message, state: FSMContext):
-#     await state.set_state(ChangedDaysBeforeRepetition.text_to_repeat)
-#     all_material = await show_all_added_material(message)
-#     if all_material:
-#         if len(all_material) > 100:
-#             while all_material:
-#                 await message.answer(await change_list_output(all_material[0:99], help_text=True, days=True))
-#                 await sleep(0.5)
-#                 all_material = all_material[99::]
-#             await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
-#         else:
-#             await message.answer(await change_list_output(all_material, help_text=True, days=True))
-#             await sleep(0.5)
-#             await message.answer(Russian.CHANGE_HELP_TEXT, parse_mode='Markdown')
-#     else:
-#         await message.answer(Russian.CHANGE_EMPTY)
-#         await state.clear()
+    await message.answer(Russian.CHANGE_BY_DAYS_NEGATIVE_NUM)
 
 
-# @router.message(ChangedDaysBeforeRepetition.text_to_repeat)
-# async def help_text_handler(message: types.Message, state: FSMContext):
-#     await state.update_data(help_text=message.text.lower())
-#     await state.set_state(ChangedDaysBeforeRepetition.change)
-#     await message.answer(Russian.CHANGE_DAYS_BEFORE_REPETITION)
+@router.message(ChangeDaysBeforeRepetition.change_several)
+async def finish_change_several_handler(message: types.Message, state: FSMContext):
+    text_to_repeat = [i[0] for i in await get_text_to_repeat(message)]
+    phrases_for_change = await divide(message.text, ',')
+    data = await state.get_data()
+    try:
+        for text in phrases_for_change:
+            if text.strip() in text_to_repeat:
+                await change_several(data['new_days'], text.strip(), message)
+            else:
+                await message.answer(f'<b>{text.strip()}</b>\n\n{Russian.CHANGE_SEVERAL_NEGATIVE_TEXT}', parse_mode='HTML')
+                raise ValueError('Invalid text to delete')
+        await message.answer(Russian.CHANGE_POSITIVE)
+        await state.clear()
+    except:
+        await state.clear()
 
 
-# @router.message(ChangedDaysBeforeRepetition.change, F.text.in_(available_number_for_repetition))
-# async def day_before_repetition_handler(message: types.Message, state: FSMContext):
-#     await state.update_data(days_before_repetition=int(message.text.strip()))
-#     data = await state.get_data()
-#     try:
-#         await change_days_before_repetition(data, message)
-#         await message.answer(Russian.CHANGE_POSITIVE)
-#         await state.clear()
-#     except:
-#         await message.answer(Russian.CHANGE_NEGATIVE_TEXT)
-#         await state.clear()
-
-
-# @router.message(ChangedDaysBeforeRepetition.change)
-# async def day_before_repetition_incorrectly_handler(message: types.Message):
-#     await message.answer(Russian.CHANGE_NEGATIVE_NUM)
+@router.message(ChangeDaysBeforeRepetition.change_one)
+async def finish_change_one_handler(message: types.Message, state: FSMContext):
+    await state.update_data(text_to_repeat=message.text.strip())
+    data = await state.get_data()
+    try:
+        await change_one(data, message)
+        await message.answer(Russian.CHANGE_POSITIVE)
+        await state.clear()
+    except:
+        await message.answer(Russian.CHANGE_ONE_NEGATIVE_TEXT)
+        await state.clear()

@@ -4,7 +4,6 @@ from aiogram.filters.state import StatesGroup, State
 from aiogram import types
 from db.func_for_db import show_all_added_material, delete_one, delete_all, delete_several, get_text_to_repeat
 from keyboards.client_keyboards import kb_for_delete
-from create_bot import bot
 from additional_func import divide
 from language.russian import Russian
 
@@ -58,18 +57,17 @@ async def finish_delete_text_handler(message: types.Message, state: FSMContext):
         phrases_for_deletion = await divide(message.text, ',')
         try:
             for text in phrases_for_deletion:
-                if text in text_to_repeat:
-                    continue
+                if text.strip() in text_to_repeat:
+                    await delete_several(text.strip(), message)
                 else:
+                    await message.answer(f'<b>{text.strip()}</b>\n\n{Russian.DELETE_SEVERAL_NEGATIVE}', parse_mode='HTML')
                     raise ValueError('Invalid text to delete')
-            await delete_several(phrases_for_deletion, message)
             await message.answer(Russian.DELETE_SEVERAL_POSITIVE)
             await state.clear()
         except:
-            await message.answer(Russian.DELETE_SEVERAL_NEGATIVE)
             await state.clear()
     elif deletion_type['deletion_type'] == 'delete_one':
-        if message.text in text_to_repeat:
+        if message.text.strip() in text_to_repeat:
             await delete_one(message)
             await message.answer(Russian.DELETE_ONE_POSITIVE)
             await state.clear()

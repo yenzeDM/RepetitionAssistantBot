@@ -51,11 +51,9 @@ async def delete_one(message):
 
 
 # delete.py
-async def delete_several(tmp, message):
-    while tmp:
-        cur.execute('DELETE FROM material WHERE text_to_repeat == ? and user_tg_id == ?',
-                    (tmp[0], message.from_user.id,))
-        tmp = tmp[1::]
+async def delete_several(text_to_repeat, message):
+    cur.execute('DELETE FROM material WHERE text_to_repeat == ? and user_tg_id == ?',
+                (text_to_repeat, message.from_user.id,))
     base.commit()
 
 
@@ -102,21 +100,28 @@ async def get_text_to_repeat(message):
 
 
 # change_days.py
-async def change_days_before_repetition(data, message):
-    tmp = [help_text[0] for help_text in cur.execute(
-        'SELECT help_text FROM material WHERE user_tg_id == ?', (message.from_user.id,)).fetchall()]
-    if data['help_text'] in tmp:
-        cur.execute('UPDATE material SET days_before_repetition == ? WHERE help_text == ?',
-                    (data['days_before_repetition'], data['help_text'],))
+async def change_one(data, message):
+    tmp = [text_to_repeat[0] for text_to_repeat in cur.execute(
+        'SELECT text_to_repeat FROM material WHERE user_tg_id == ?', (message.from_user.id,)).fetchall()]
+    if data['text_to_repeat'] in tmp:
+        cur.execute('UPDATE material SET days_before_repetition == ? WHERE text_to_repeat == ? and user_tg_id == ?',
+                    (data['new_days'], data['text_to_repeat'], message.from_user.id,))
         base.commit()
     else:
-        raise ValueError
+        raise ValueError('Invalid text to change')
 
 
 # change_days.py
 async def change_by_days(data, message):
     cur.execute('UPDATE material SET days_before_repetition == ? WHERE days_before_repetition == ? and user_tg_id == ?',
                 (data['new_days'], data['old_days'], message.from_user.id,))
+    base.commit()
+
+
+# change_days.py
+async def change_several(new_days, text_to_repeat, message):
+    cur.execute(
+        'UPDATE material SET days_before_repetition == ? WHERE text_to_repeat == ? and user_tg_id ==?', (new_days, text_to_repeat, message.from_user.id,))
     base.commit()
 
 

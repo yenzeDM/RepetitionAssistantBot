@@ -1,3 +1,4 @@
+# Не используется
 class English:
     # add.py
     ADD_TEXT_TO_REPEAT = '1️⃣\n\nTo cancel the command, press ⚠️/cancel\n\n✍️ Enter any phrase or what you want to repeat.\n\n_"It can be a word, a phrase, a rule that you want to learn. You can add anything you want, it is only limited by your imagination."_:'
