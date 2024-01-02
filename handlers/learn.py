@@ -6,6 +6,7 @@ from db.func_for_db import show_finished_text_to_repeat, change_date
 from additional_func import change_list_output
 from asyncio import sleep
 from language.russian import Russian
+from random import shuffle
 
 
 router = Router()
@@ -19,6 +20,7 @@ class LearnPhrases(StatesGroup):
 async def learn_handler(message: types.Message, state: FSMContext):
     await state.update_data(text_to_repeat=await show_finished_text_to_repeat(message.from_user.id))
     data = await state.get_data()
+    shuffle(data['text_to_repeat'])
     if data['text_to_repeat']:
         await state.set_state(LearnPhrases.learn)
         if len(data['text_to_repeat']) > 100:
