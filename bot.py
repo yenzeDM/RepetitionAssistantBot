@@ -22,8 +22,9 @@ async def remove_inactive_users():
 async def notification_to_repeat(bot):
     users_id = await get_users_id()
     for id in users_id:
-        if len(await show_finished_text_to_repeat(id[0])) >= 20:
-            await bot.send_message(id[0], Russian.TIME_TO_REPEAT)
+        amount = len(await show_finished_text_to_repeat(id[0]))
+        if amount >= 1:
+            await bot.send_message(id[0], Russian.TIME_TO_REPEAT + f'{amount}')
 
 
 def schedule_jobs():
