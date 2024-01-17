@@ -15,7 +15,7 @@ async def remove_inactive_users():
     for user_id, last_activity in users_activity:
         tmp = datetime.datetime.strptime(last_activity, '%Y-%m-%d')
         days_gone_by = todays_date - tmp
-        if days_gone_by.days >= 0:
+        if days_gone_by.days >= 90:
             await delete_all_user_data(user_id)
 
 
