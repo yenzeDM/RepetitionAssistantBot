@@ -1,0 +1,12 @@
+[Unit]
+Description=My TG Bot
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/path_to_python /path_to_main.py
+WorkingDirectory=/path_to_work_directory
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
